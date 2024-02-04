@@ -4,10 +4,26 @@ services:
     container_name: gitlab
     image: 'gitlab/gitlab-ce:latest'
     restart: always
-    hostname: '10.10.100.10'
+    hostname: '__HOSTNAME__'
     environment:
       GITLAB_OMNIBUS_CONFIG: |
-        external_url 'https://10.10.100.10'
+        external_url 'https://__HOSTNAME__'
+        letsencrypt['enable'] = false
+        gitlab_rails['time_zone'] = 'Europe/Moscow'
+        logging['logrotate_frequency'] = "weekly"
+        logging['logrotate_rotate'] = 52
+        logging['logrotate_compress'] = "compress"
+        logging['logrotate_method'] = "copytruncate"
+        logging['logrotate_delaycompress'] = "delaycompress"
+        nginx['redirect_http_to_https'] = true
+        nginx['ssl_certificate'] = "/etc/gitlab/ssl/gitlab.crt"
+        nginx['ssl_certificate_key'] = "/etc/gitlab/ssl/gitlab.key"
+        nginx['ssl_protocols'] = "TLSv1.1 TLSv1.2"
+        nginx['logrotate_frequency'] = "weekly"
+        nginx['logrotate_rotate'] = 52
+        nginx['logrotate_compress'] = "compress"
+        nginx['logrotate_method'] = "copytruncate"
+        nginx['logrotate_delaycompress'] = "delaycompress"
         # Add any other gitlab.rb configuration here, each on its own line
     ports:
       - '80:80'
@@ -16,6 +32,7 @@ services:
     volumes:
       - '/opt/gitlab/config:/etc/gitlab'
       - '/opt/gitlab/logs:/var/log/gitlab'
+      - '/opt/gitlab/ssl:/etc/gitlab/ssl'
       - '/opt/gitlab/data:/var/opt/gitlab'
 
   gitlab-runner:
@@ -25,6 +42,9 @@ services:
     volumes:
       - '/opt/gitlab-runner/data:/home/gitlab_ci_multi_runner/data'
       - '/opt/gitlab-runner/config:/etc/gitlab-runner'
+      - '/opt/gitlab/ssl:/usr/local/share/ca-certificates'
       - '/var/run/docker.sock:/var/run/docker.sock:rw'
     environment:
-      - CI_SERVER_URL=https://10.10.100.10/ci
+      - CI_SERVER_URL=https://__HOSTNAME__/ci
+    extra_hosts:
+      - "__HOSTNAME__:__IP__"
