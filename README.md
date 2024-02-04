@@ -1,6 +1,6 @@
-# INSTALL GITLAB (SELF_HOSTED AND SEL)
+# Install GITLAB (self-hosted with self-signed certificates)
 
-### requirements
+## Requirements
 
 - jq
 
@@ -22,7 +22,7 @@ sudo curl -SL https://github.com/docker/compose/releases/download/v2.24.5/docker
 sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
 ```
 
-### steps
+## Steps
 
 ```bash
 chmod +x helper.sh
